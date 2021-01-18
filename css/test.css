@@ -1,18 +1,50 @@
-#bmiForm,
-#bmiOutput {
-    /* width: 320px; */
-    margin: 2px;
-    padding: 10px;
-    border: 1px solid gray;
-    border-radius: 10px;
+@media screen and (max-width: 450px) {
+
+    /*スマホ用*/
+
+    #bmiForm,
+    #bmiOutput {
+        /* width: 320px; */
+        margin: 2px;
+        padding: 10px;
+        border: 1px solid gray;
+        border-radius: 10px;
+    }
+    #bmiForm {
+        background-color: #f0f8ff;
+    }
+    #bmiOutput {
+        background-color: #9fffff;
+    }
+    #bmiForm * {
+        margin: 0 0 7px 0;
+        vertical-align: text-top;
+    }
+
 }
-#bmiForm {
-    background-color: #f0f8ff;
+
+@media screen and (min-width: 450px) {
+
+    /*PC等用*/
+
+    #bmiForm,
+    #bmiOutput {
+        width: 320px;
+        margin: 2px;
+        padding: 10px;
+        border: 1px solid gray;
+        border-radius: 10px;
+    }
+    #bmiForm {
+        background-color: #f0f8ff;
+    }
+    #bmiOutput {
+        background-color: #9fffff;
+    }
+    #bmiForm * {
+        margin: 0 0 7px 0;
+        vertical-align: text-top;
+    }
+
 }
-#bmiOutput {
-    background-color: #9fffff;
-}
-#bmiForm * {
-    margin: 0 0 7px 0;
-    vertical-align: text-top;
-}
+
