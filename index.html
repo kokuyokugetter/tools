@@ -13,24 +13,49 @@
 </head>
 <body>
 
-  <form id="bmiForm">
-    【BMI計算】
-    <br />
-    身長[cm]：<input type="text" name="formHeight" value="170">
-    <br />
-    体重[kg]：<input type="text" name="formWeight" value="60">
-    <br />
-  </form>
-  <div id="bmiOutput">
-    【出力欄】
-    <br />
-    BMI：<span id="bmiValue"></span>
-    <br />
-    <br />
-    【参考】
-    <img src="https://www.asahigroup-holdings.com/company/research/hapiken/census/bn/20080125/img/080125_graph.jpg" width="100%" alt="fig1">
+  <div id="leftside">
+    <div id="bmi">
+      <form id="bmiForm">
+        【BMI計算】
+        <br />
+        身長[cm]：<input type="number" name="formHeight" value="170">
+        <br />
+        体重[kg]：<input type="number" name="formWeight" value="60">
+        <br />
+      </form>
+      <div id="bmiOutput">
+        【結果】
+        <br />
+        BMI：<span id="bmiValue"></span>
+        <br />
+        <br />
+        【参考】
+        <img src="https://www.asahigroup-holdings.com/company/research/hapiken/census/bn/20080125/img/080125_graph.jpg" width="98%" alt="fig1">
+      </div>
+    </div>
+  </div>
 
+  <div id="center-right">
+    <div id="centerside">
+      <div id="inch-centi">
+        <form id="inch-centiForm">
+          【センチ-インチ変換】
+          <br />
+          インチ：<input type="number" name="formInch" value="24">
+          <br />
+          センチ：<input type="number" name="formCenti" value="0">
+          <br />
+        </form>
+      </div>
+    </div>
 
+    <div id="rightside">
+      b
+      <br>
+      <br>
+      <br>
+      <br>
+    </div>
   </div>
 
 </body>

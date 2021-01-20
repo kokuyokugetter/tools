@@ -1,50 +1,66 @@
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 1000px) {
 
     /*スマホ用*/
 
-    #bmiForm,
-    #bmiOutput {
-        /* width: 320px; */
-        margin: 2px;
-        padding: 10px;
-        border: 1px solid gray;
-        border-radius: 10px;
-    }
-    #bmiForm {
-        background-color: #f0f8ff;
-    }
-    #bmiOutput {
-        background-color: #9fffff;
-    }
-    #bmiForm * {
-        margin: 0 0 7px 0;
-        vertical-align: text-top;
-    }
-
 }
 
-@media screen and (min-width: 450px) {
+@media screen and (min-width: 1000px) {
 
     /*PC等用*/
 
-    #bmiForm,
-    #bmiOutput {
-        width: 320px;
-        margin: 2px;
-        padding: 10px;
-        border: 1px solid gray;
-        border-radius: 10px;
+    #leftside {
+        float:left;
+        width:28%;
     }
-    #bmiForm {
-        background-color: #f0f8ff;
+
+    #center-right {
+        float: right;
+        width: 71%;
     }
-    #bmiOutput {
-        background-color: #9fffff;
+    #centerside {
+        float:left;
+        width: 49%;
+        /* margin: 0 30%; */
     }
-    #bmiForm * {
-        margin: 0 0 7px 0;
-        vertical-align: text-top;
+    #rightside {
+        float:right;
+        width: 49%;
     }
 
 }
 
+input{font-size:large;}
+
+#bmiForm,
+#bmiOutput {
+    margin: 5px;
+    padding: 15px;
+    /* border: 1px solid gray; */
+    /* border-radius: 15px; */
+}
+
+#bmi {
+    background-color: #d0fdff;
+    border-radius: 15px;
+    font-size: large;
+}
+#bmiForm * {
+    margin: 0 0 5px 0;
+    vertical-align: text-top;
+}
+
+#inch-centi {
+    background-color: #faffb8;
+    border-radius: 15px;
+    font-size: large;
+}
+
+#inch-centiForm {
+    margin: 5px;
+    padding: 15px;
+}
+
+#inch-centiForm * {
+    margin: 0 0 5px 0;
+    vertical-align: text-top;
+}
