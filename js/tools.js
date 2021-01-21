@@ -69,3 +69,43 @@ function CalJapaneseEra() {
     jQuery( '#era' ).html( "平成" );
     jQuery( '#yearValue' ).html( `${diff_heisei}年` );
 }
+
+// 干支
+jQuery( function() {
+    decideZodiac();
+    var $formObjectInputInch = jQuery( '#yearForm :input[name=year]' );
+    $formObjectInputInch.change( function() { decideZodiac(); } );
+    $formObjectInputInch.keyup( function() { decideZodiac(); } );
+} );
+function decideZodiac() {
+    var $formObject = jQuery( '#yearForm' );
+    var year = $formObject.find( '[name=year]' ).val()
+    let zodiac = ['サル', 'トリ', 'イヌ', 'イノシシ', 'ネズミ', 'ウシ',
+        'トラ', 'ウサギ', 'リュウ', 'ヘビ', 'ウマ', 'ヒツジ'] //サルが12で割り切れる年なので0番目
+    jQuery( '#zodiacName' ).html( zodiac[(year) % 12] );
+}
+
+//閏年
+jQuery( function() {
+    decideLeapYear();
+    var $formObjectInputInch = jQuery( '#yearForm :input[name=year]' );
+    $formObjectInputInch.change( function() { decideLeapYear(); } );
+    $formObjectInputInch.keyup( function() { decideLeapYear(); } );
+} );
+function decideLeapYear() {
+    var $formObject = jQuery( '#yearForm' );
+    var year = $formObject.find( '[name=year]' ).val()
+    if (year % 400 == 0) {
+        jQuery( '#isLeapYear' ).html( "閏年" );
+        return 0;
+    }
+    if (year % 100 == 0) {
+        jQuery( '#isLeapYear' ).html( "" );
+        return 0;
+    }
+    if (year % 4 == 0) {
+        jQuery( '#isLeapYear' ).html( "閏年" );
+        return 0;
+    }
+    jQuery( '#isLeapYear' ).html( "" );
+}
