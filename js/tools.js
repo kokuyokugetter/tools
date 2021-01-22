@@ -109,3 +109,21 @@ function decideLeapYear() {
     }
     jQuery( '#isLeapYear' ).html( "" );
 }
+
+// 年齢計算
+jQuery( function() {
+    calAge();
+    var $formObjectInputInch = jQuery( '#yearForm :input[name=year]' );
+    $formObjectInputInch.change( function() { calAge(); } );
+    $formObjectInputInch.keyup( function() { calAge(); } );
+    var $formObjectInputInch = jQuery( '#birthYearForm :input[name=birth]' );
+    $formObjectInputInch.change( function() { calAge(); } );
+    $formObjectInputInch.keyup( function() { calAge(); } );
+} );
+function calAge() {
+    var $formObject = jQuery( '#yearForm' );
+    var year = $formObject.find( '[name=year]' ).val()
+    var $formObject2 = jQuery( '#birthYearForm' );
+    var birth = $formObject2.find( '[name=birth]' ).val()
+    jQuery( '#ageValue' ).html( year - birth );
+}
