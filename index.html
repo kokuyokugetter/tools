@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="日付、単位、割合などをすぐに計算できる無料のツール集。入力はブラウザ内で処理します。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>ちょっとしたツール</title>
+  <link rel="stylesheet" href="./css/tools.css">
+  <script type="module" src="./js/tools.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <a class="brand" href="./">TOOLS<span>.</span></a>
+      <button id="theme" type="button" aria-label="ダークモード" aria-pressed="false">◐</button>
+    </header>
+    <section class="intro" aria-labelledby="title">
+      <h1 id="title">ちょっとしたツール<span>。</span></h1>
+      <p>日付、単位、割合。よく使う計算を、すぐ手元に。</p>
+      <label class="search">
+        <span aria-hidden="true">⌕</span>
+        <input id="search" type="search" placeholder="ツールを検索（例：和暦、inch、割引）" aria-label="ツールを検索" autocomplete="off">
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+    </section>
+    <noscript>ツールを使うにはJavaScriptを有効にしてください。</noscript>
+    <nav id="filters" aria-label="ツールのカテゴリ"></nav>
+    <p id="count" role="status"></p>
+    <ul id="catalog"></ul>
+    <section id="tool" class="tool" hidden></section>
+    <footer><a href="../">HOME</a><span>入力値はブラウザ内で処理されます。</span></footer>
+  </main>
+</body>
+</html>
