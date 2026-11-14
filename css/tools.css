@@ -20,8 +20,8 @@ header { display: flex; justify-content: space-between; align-items: center; pad
 a { color: var(--accent); }
 .brand { font-weight: 900; letter-spacing: .12em; text-decoration: none; color: var(--ink); }
 h1 span, .brand span { color: var(--accent); }
-button, input, select { font: inherit; color: inherit; }
-button, select, input { border: 1px solid var(--line); border-radius: .65rem; background: var(--card); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button, select, input, textarea { border: 1px solid var(--line); border-radius: .65rem; background: var(--card); }
 button { cursor: pointer; padding: .45rem .8rem; }
 button[aria-pressed="true"] { color: var(--accent); background: var(--tint); border-color: var(--accent); }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
@@ -45,7 +45,15 @@ nav { display: flex; flex-wrap: wrap; gap: .45rem; }
 .tool h2 { margin: 0; }
 .tool form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .85rem; }
 .field { display: grid; gap: .35rem; align-content: start; }
-.field input, .field select { width: 100%; min-width: 0; min-height: 2.75rem; padding: .45rem .6rem; }
+.field input, .field select, .field textarea { width: 100%; min-width: 0; min-height: 2.75rem; padding: .45rem .6rem; }
+.field-wide, .tool-actions { grid-column: 1 / -1; }
+.field textarea, .result-detail { font-family: ui-monospace, monospace; font-size: .9rem; }
+.field textarea { resize: vertical; }
+.tool-actions { display: flex; flex-wrap: wrap; gap: .55rem; }
+.run-tool { background: var(--tint); color: var(--accent); border-color: var(--accent); font-weight: 650; }
+button:disabled { opacity: .55; cursor: default; }
 output { display: block; white-space: pre-line; margin-top: 1rem; padding: .85rem; background: var(--tint); border-radius: .65rem; color: var(--accent); font-weight: 650; overflow-wrap: anywhere; }
+.result-detail { max-height: 28rem; overflow: auto; border: 1px solid var(--line); border-radius: .65rem; padding: .85rem; }
+.result-download:not([hidden]) { display: inline-block; margin-top: .75rem; overflow-wrap: anywhere; }
 footer { margin: 2.5rem 0 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; }
 footer { display: flex; flex-wrap: wrap; gap: .65rem 1.2rem; }
