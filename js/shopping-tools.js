@@ -1,54 +1,114 @@
-const number = new Intl.NumberFormat('ja-JP', { maximumFractionDigits: 4 });
-const format = (value) => number.format(value);
-const decimal = /^(?:\d+(?:\.\d+)?|\.\d+)$/;
+const format = new Intl.NumberFormat('ja-JP', { maximumFractionDigits: 4 }).format;
+const input = (name, label, min) => ({ name, label, min, type: 'number', step: 'any' });
+
+const units = [
+  ['g', 'g', 1, '100g', 100], ['kg', 'kg', 1000, '100g', 100],
+  ['ml', 'mL', 1, '100mL', 100], ['l', 'L', 1000, '100mL', 100],
+  ['each', '個・枚', 1, '1点', 1],
+];
 
 export const shoppingTools = [
   {
-    id: 'price-per-gram', name: 'グラム単価のまとめ比較', category: '買い物',
-    description: '容量の違う商品を最大1,000件を並べて、100gあたりの価格が安い順に比較。',
-    keywords: 'g kg グラム 100g 単価 大容量 コスパ お得 食品 値段',
-    fields: [{
-      name: 'products', label: '1行に1商品「商品名,価格（円）,内容量（g）」',
-      type: 'textarea', value: '商品A,298,400\n商品B,498,750\n商品C,168,180',
-    }],
-    calculate({ products }) {
-      if (products.length > 250_000) throw new Error('入力は25万文字以内にしてください。');
-      const rows = products.split(/\r\n?|\n/).map((line, index) => ({ line, index }))
-        .filter(({ line }) => line.trim());
-      if (!rows.length || rows.length > 1000) throw new Error('商品を1〜1,000件入力してください。');
-      const ranked = rows.map(({ line, index }) => {
-        const [name, yen, grams, extra] = line.replace(/，/g, ',').split(',').map((part) => part.trim());
-        const price = Number(yen?.normalize('NFKC'));
-        const weight = Number(grams?.normalize('NFKC'));
-        const rate = price / weight * 100;
-        if (!name || extra !== undefined || !decimal.test(yen?.normalize('NFKC')) ||
-            !decimal.test(grams?.normalize('NFKC')) || !(weight > 0) || !Number.isFinite(rate)) {
-          throw new Error(`${index + 1}行目は「商品名,価格（0円以上）,内容量（0gより大きい値）」で入力してください。`);
+    id: 'price-per-gram', name: 'どっちがお得？ 単価比較', category: '買い物',
+    description: '価格と内容量を入れるだけ。3商品以上も比べられます。',
+    keywords: 'g kg グラム 100g ml 単価 大容量 コスパ お得 食品 値段 ねだん 容量',
+    mount(form, result, controlFor) {
+      const products = [];
+      let nextId = 1;
+      const hint = document.createElement('p');
+      hint.className = 'field-wide form-hint';
+      hint.textContent = '価格の条件はそろえてください（例：すべて税込）。';
+      const list = document.createElement('div');
+      list.className = 'field-wide product-list';
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'add-product';
+      add.textContent = '＋ 商品を追加';
+      form.append(hint, list, add);
+
+      function update() {
+        const groups = new Map();
+        let incomplete = 0;
+        for (const { id, name, price, amount, unit } of products) {
+          if (!price.value && !amount.value && !price.validity.badInput && !amount.validity.badInput) continue;
+          const [, , factor, base, scale] = units.find(([value]) => value === unit.value);
+          const rate = price.valueAsNumber / (amount.valueAsNumber * factor) * scale;
+          if (!price.validity.valid || !(amount.valueAsNumber > 0) || !Number.isFinite(rate)) {
+            incomplete++;
+            continue;
+          }
+          if (!groups.has(base)) groups.set(base, []);
+          groups.get(base).push({ label: name.value.trim() || '商品' + id, rate });
         }
-        return { name, price, weight, rate };
-      }).sort((a, b) => a.rate - b.rate);
-      const detail = ranked.map(({ name, price, weight, rate }, index) =>
-        `${index + 1}. ${name}　${format(rate)} 円 / 100g　（${format(price)}円 / ${format(weight)}g）`).join('\n');
-      return { text: `最安単価 ${format(ranked[0].rate)} 円 / 100g（${ranked.length}件を比較）`, detail };
+        const lines = [];
+        for (const [base, items] of groups) {
+          items.sort((a, b) => a.rate - b.rate);
+          const { rate } = items[0];
+          const same = items.filter((item) => Math.abs(item.rate - rate) <= Number.EPSILON * Math.max(item.rate, rate) * 4);
+          if (same.length > 1) {
+            lines.push(`${same.map(({ label }) => label).join('・')}が同じ最安単価（${base}あたり）`);
+          } else if (items.length > 1) {
+            lines.push(`${items[0].label}がお得（${base}あたり2番目より${format(items[1].rate - rate)}円安い）`);
+          }
+          lines.push(...items.map(({ label, rate: value }) => `${label}　${format(value)}円 / ${base}`));
+        }
+        if (groups.size > 1) lines.push('重さ・容量・個数は、同じ種類ごとに比較します。');
+        if (incomplete) lines.push(`${incomplete}件の価格と内容量を確認してください。`);
+        result.textContent = lines.join('\n') || '商品の価格と内容量を入力してください。';
+        for (const { remove } of products) remove.disabled = products.length <= 2;
+      }
+
+      function addProduct(focus = false) {
+        const id = nextId++;
+        const row = document.createElement('fieldset');
+        const title = document.createElement('legend');
+        title.textContent = '商品' + id;
+        const priceLabel = controlFor(input('price', '価格（円）', 0));
+        const amountLabel = controlFor(input('amount', '内容量', 0));
+        const unitLabel = controlFor({ name: 'unit', label: '単位', choices: units });
+        const nameLabel = controlFor({ name: 'productName', label: '商品名（任意）', type: 'text' });
+        nameLabel.classList.add('product-name');
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.textContent = '削除';
+        remove.setAttribute('aria-label', '商品' + id + 'を削除');
+        const price = priceLabel.querySelector('input');
+        const amount = amountLabel.querySelector('input');
+        const unit = unitLabel.querySelector('select');
+        const product = { id, name: nameLabel.querySelector('input'), price, amount, unit, remove };
+        remove.addEventListener('click', () => {
+          products.splice(products.indexOf(product), 1);
+          row.remove();
+          update();
+          add.focus();
+        });
+        row.append(title, priceLabel, amountLabel, unitLabel, nameLabel, remove);
+        list.append(row);
+        products.push(product);
+        update();
+        if (focus) price.focus();
+      }
+
+      add.addEventListener('click', () => addProduct(true));
+      form.addEventListener('input', update);
+      addProduct();
+      addProduct();
     },
   },
   {
-    id: 'discount-rate', name: '実際の割引率を逆算', category: '買い物',
-    description: '元値と現在価格から、何割引・何％引きかと値引き額を計算。',
-    keywords: '価格 セール 値引き 割引き 割合 逆算 off パーセント',
-    fields: [
-      { name: 'original', label: '元の価格（円）', type: 'number', step: 'any', min: 0.01, value: 1980 },
-      { name: 'current', label: '現在価格（円）', type: 'number', step: 'any', min: 0, value: 1480 },
-    ],
+    id: 'discount-rate', name: '何割引？', category: '買い物',
+    description: '元の値段と今の値段から、何割・何パーセント安くなったかを計算。',
+    keywords: '割引率 割引 わりびき 価格 ねだん セール 値引き 逆算 off',
+    fields: [input('original', '元の値段（円）', 0), input('current', '今の値段（円）', 0)],
     calculate({ original, current }) {
-      if (!(original > 0) || !(current >= 0)) throw new Error('元の価格は0円より大きい値、現在価格は0円以上で入力してください。');
+      if (!(original > 0) || !(current >= 0)) return '元の値段は0円より大きい値、今の値段は0円以上を入力してください。';
       const difference = original - current;
       const rate = Math.abs(difference) / original;
-      if (!Number.isFinite(rate * 100)) throw new Error('計算範囲を超えています。');
-      if (difference === 0) return { text: '価格は同じです（0%）。' };
-      const change = difference > 0 ? '引き' : '増し';
-      const label = difference > 0 ? '値引き額' : '値上がり額';
-      return { text: `${format(rate * 100)}% ${change}（${format(rate * 10)}割${difference > 0 ? '引' : '増'}）\n${label} ${format(Math.abs(difference))}円` };
+      if (!Number.isFinite(rate * 100)) return '計算範囲を超えています。';
+      if (difference === 0) return '価格は同じです（0%）。';
+      return difference > 0
+        ? `${format(rate * 100)}%引き（${format(rate * 10)}割引）\n${format(difference)}円安くなります。`
+        : `${format(rate * 100)}%値上がり\n${format(-difference)}円高くなります。`;
     },
   },
 ];

@@ -35,25 +35,41 @@ h1 { font-size: clamp(1.8rem, 6.5vw, 4rem); letter-spacing: -.055em; margin: 0; 
 kbd { border: 1px solid var(--line); border-radius: .3rem; padding: .1rem .45rem; color: var(--muted); }
 nav { display: flex; flex-wrap: wrap; gap: .45rem; }
 #count { margin: 1.3rem 0 .65rem; font-size: .86rem; }
-#catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: .8rem; list-style: none; padding: 0; margin: 0; }
-.card { display: flex; flex-direction: column; height: 100%; padding: 1.05rem; border: 1px solid var(--line); border-radius: .9rem; background: var(--card); text-decoration: none; color: var(--ink); }
-.card:hover, .card[aria-current="true"] { border-color: var(--accent); background: var(--tint); }
-.card small { color: var(--accent); }
-.card strong { margin: .45rem 0 0; font-size: 1.08rem; }
-.card p { margin: .35rem 0 0; font-size: .88rem; }
-.tool { scroll-margin-top: 1rem; margin-top: 1rem; padding: clamp(1rem, 4vw, 2rem); border: 1px solid var(--line); border-radius: 1rem; background: var(--card); }
-.tool h2 { margin: 0; }
+#catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: .8rem; align-items: start; list-style: none; padding: 0; margin: 0; overflow-anchor: none; }
+.tool-card { min-width: 0; border: 1px solid var(--line); border-radius: .9rem; background: var(--card); container-type: inline-size; }
+.tool-card:has([aria-expanded="true"]) { border-color: var(--accent); }
+.card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .35rem .65rem; width: 100%; border: 0; border-radius: inherit; padding: 1.05rem; text-align: left; }
+.card:hover, .card[aria-expanded="true"] { background: var(--tint); }
+.card-category { color: var(--accent); font-size: .82rem; }
+.card-title { grid-column: 1; font-weight: 700; font-size: 1.08rem; }
+.card-description { grid-column: 1; color: var(--muted); font-size: .88rem; }
+.card-arrow { grid-column: 2; grid-row: 1 / 4; align-self: center; color: var(--accent); font-size: 1.4rem; }
+.card[aria-expanded="true"] .card-arrow { transform: rotate(180deg); }
+.tool { padding: 1rem; border-top: 1px solid var(--line); }
+.close-tool { margin-top: .8rem; }
 .tool form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .85rem; }
 .field { display: grid; gap: .35rem; align-content: start; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; min-height: 2.75rem; padding: .45rem .6rem; }
-.field-wide, .tool-actions { grid-column: 1 / -1; }
-.field textarea, .result-detail { font-family: ui-monospace, monospace; font-size: .9rem; }
+.field-wide { grid-column: 1 / -1; }
+.field textarea { font-family: ui-monospace, monospace; font-size: .9rem; }
 .field textarea { resize: vertical; }
-.tool-actions { display: flex; flex-wrap: wrap; gap: .55rem; }
-.run-tool { background: var(--tint); color: var(--accent); border-color: var(--accent); font-weight: 650; }
-button:disabled { opacity: .55; cursor: default; }
 output { display: block; white-space: pre-line; margin-top: 1rem; padding: .85rem; background: var(--tint); border-radius: .65rem; color: var(--accent); font-weight: 650; overflow-wrap: anywhere; }
-.result-detail { max-height: 28rem; overflow: auto; border: 1px solid var(--line); border-radius: .65rem; padding: .85rem; }
-.result-download:not([hidden]) { display: inline-block; margin-top: .75rem; overflow-wrap: anywhere; }
 footer { margin: 2.5rem 0 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; }
 footer { display: flex; flex-wrap: wrap; gap: .65rem 1.2rem; }
+
+nav button, .tool button { min-height: 44px; }
+.form-hint { margin: 0; color: var(--muted); }
+.product-list { display: grid; gap: .75rem; }
+.product-list fieldset { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(4rem, .75fr); gap: .5rem; align-items: end; min-width: 0; margin: 0; padding: .75rem; border: 1px solid var(--line); border-radius: .65rem; }
+.product-list legend { padding: 0 .35rem; font-weight: 650; }
+.product-name { grid-column: 1 / 4; }
+.product-list button:disabled { display: none; }
+.add-product { justify-self: start; }
+.product-list button { grid-column: 1 / -1; justify-self: end; }
+@container (max-width: 299px) {
+  .tool, .product-list fieldset { padding: .65rem; }
+}
+.ingredient-list { display: grid; gap: .75rem; min-width: 0; }
+.ingredient-list fieldset { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: .5rem; min-width: 0; margin: 0; padding: .65rem; border: 1px solid var(--line); border-radius: .65rem; }
+.ingredient-list legend { padding: 0 .35rem; font-weight: 650; }
+.ingredient-list button { grid-column: 1 / -1; justify-self: end; }

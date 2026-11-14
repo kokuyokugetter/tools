@@ -1,6 +1,5 @@
 const number = (name, label, options = {}) => ({ name, label, type: 'number', step: 'any', ...options });
 const date = (name, label) => ({ name, label, type: 'date' });
-const select = (name, label, choices) => ({ name, label, choices });
 
 const today = new Date();
 const thisYear = today.getFullYear();
@@ -23,7 +22,7 @@ const isLeap = (year) => year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0
 
 export const calculators = [
   {
-    id: 'year-relations', name: '西暦・和暦と年齢', category: '日付',
+    id: 'year-relations', name: '西暦・和暦と年齢', category: '日付・単位',
     description: '元号、干支、うるう年、その年に迎える年齢。',
     keywords: '令和 平成 昭和 大正 明治 閏年 十二支 年齢 誕生日 早見 年号 calendar year age',
     fields: [yearField('year', '調べる西暦', thisYear), yearField('birth', '生まれ年（任意）')],
@@ -48,7 +47,7 @@ export const calculators = [
     },
   },
   {
-    id: 'inch-centi', name: 'インチ・センチ変換', category: '単位',
+    id: 'inch-centi', name: 'インチ・センチ変換', category: '日付・単位',
     description: 'どちらの欄からでも換算。画面サイズや寸法に。',
     keywords: 'inch inches in cm センチメートル 長さ モニター',
     fields: [number('inch', 'インチ（in）', { value: 24 }), number('cm', 'センチ（cm）')],
@@ -61,59 +60,27 @@ export const calculators = [
     calculate() { return '1 in = 2.54 cm'; },
   },
   {
-    id: 'bmi', name: 'BMI計算', category: '単位',
-    description: '身長と体重からBMIを計算。',
-    keywords: 'bmi 身長 体重 kg cm',
-    fields: [number('height', '身長（cm）'), number('weight', '体重（kg）')],
-    calculate({ height, weight }) {
-      return height > 0 && weight > 0
-        ? `BMI ${format(weight / (height / 100) ** 2, 2)}`
-        : '身長と体重を正の数で入力してください。';
-    },
-  },
-  {
-    id: 'date-difference', name: '日付の差・日数計算', category: '日付',
+    id: 'date-difference', name: 'あと何日？ 日にちの間隔', category: '日付・単位',
     description: 'ふたつの日付の間の日数を計算。',
-    keywords: 'date days 何日 期間 日付差 経過 あと何日',
-    fields: [{ ...date('start', '開始日'), value: todayValue }, date('end', '終了日')],
+    keywords: 'date days 何日 期間 日付差 経過 あと何日 たんじょうび 誕生日 いつまで 夏休み',
+    fields: [{ ...date('start', 'いつから？'), value: todayValue }, date('end', 'いつまで？')],
     calculate({ start, end }) {
-      if (!start || !end) return '開始日と終了日を入力してください。';
+      if (!start || !end) return '2つの日付を入力してください。';
       const days = (Date.parse(end) - Date.parse(start)) / 86_400_000;
       return Number.isFinite(days)
-        ? `開始日から終了日まで ${format(days)}日\n両端を含めると ${format(Math.abs(days) + 1)}日`
+        ? `${days < 0 ? '2つ目の日付は' : '2つ目の日付まで'} ${format(Math.abs(days))}日${days < 0 ? '前' : ''}\n最初と最後の日を両方数えると ${format(Math.abs(days) + 1)}日`
         : '日付を確認してください。';
     },
   },
   {
-    id: 'percentage', name: '割合・増減率', category: '計算',
-    description: '全体に占める割合と、元の値からの増減率。',
-    keywords: 'パーセント % percent ratio 比率 前年比',
-    fields: [number('base', '基準の値'), number('value', '比較する値')],
-    calculate({ base, value }) {
-      if (base === undefined || value === undefined) return '2つの値を入力してください。';
-      if (base === 0) return '基準が0のとき、割合と増減率は定義されません。';
-      return `基準に対する割合 ${format(value / base * 100)}%\n基準からの増減率 ${format((value - base) / Math.abs(base) * 100)}%`;
-    },
-  },
-  {
-    id: 'discount', name: '割引計算', category: '計算',
+    id: 'discount', name: '割引後はいくら？', category: '買い物',
     description: '元の価格と割引率から、支払額と値引き額を計算。',
-    keywords: 'セール 値引き 割引き 何割引 price off 買い物',
-    fields: [number('price', '元の価格（円）', { min: 0 }), number('rate', '割引率（%）', { min: 0, max: 100 })],
+    keywords: 'セール 値引き 割引き わりびき 何割引 price off 買い物',
+    fields: [number('price', '元の価格（円）', { min: 0 }), number('rate', '割引率（例：2割引なら20%）', { min: 0, max: 100 })],
     calculate({ price, rate }) {
       if (price === undefined || rate === undefined) return '価格と0〜100%の割引率を入力してください。';
       const saving = price * (rate / 100);
-      return `割引後 ${format(price - saving, 2)}円\n値引き額 ${format(saving, 2)}円`;
-    },
-  },
-  {
-    id: 'temperature', name: '温度変換', category: '単位',
-    description: '摂氏と華氏を相互に換算。',
-    keywords: '摂氏 華氏 celsius fahrenheit ℃ ℉ 料理',
-    fields: [number('value', '温度'), select('unit', '入力単位', [['c', '摂氏（℃）'], ['f', '華氏（℉）']])],
-    calculate({ value, unit }) {
-      if (value === undefined) return '温度を入力してください。';
-      return unit === 'c' ? `${format(value * 9 / 5 + 32)} ℉` : `${format((value - 32) * 5 / 9)} ℃`;
+      return `支払う金額 ${format(price - saving, 2)}円\n値引き額 ${format(saving, 2)}円`;
     },
   },
 ];

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="日付・単位の換算からデータ分析、最適化、ファイル処理まで。入力はブラウザ内で処理します。">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="description" content="買い物、料理、仕事、学校で使える日常の計算ツール。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>ちょっとしたツール</title>
   <link rel="stylesheet" href="./css/tools.css">
   <script type="module" src="./js/tools.js"></script>
@@ -18,10 +18,10 @@
     </header>
     <section class="intro" aria-labelledby="title">
       <h1 id="title">ちょっとしたツール<span>。</span></h1>
-      <p>日付・単位の換算から、データ分析、最適化、ファイル処理まで。</p>
+      <p>買い物、料理、仕事や学校で、ちょっと計算したいときに。</p>
       <label class="search">
         <span aria-hidden="true">⌕</span>
-        <input id="search" type="search" placeholder="ツールを検索（例：和暦、CSV、SHA-256）" aria-label="ツールを検索" autocomplete="off">
+        <input id="search" type="search" placeholder="例：わりびき、勤務時間、たんじょうび" aria-label="ツールを検索" autocomplete="off">
         <kbd aria-hidden="true">/</kbd>
       </label>
     </section>
@@ -29,7 +29,6 @@
     <nav id="filters" aria-label="ツールのカテゴリ"></nav>
     <p id="count" role="status"></p>
     <ul id="catalog"></ul>
-    <section id="tool" class="tool" hidden></section>
     <footer><a href="../">HOME</a><span>入力値はブラウザ内で処理されます。</span></footer>
   </main>
 </body>
