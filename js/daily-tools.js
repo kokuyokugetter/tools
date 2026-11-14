@@ -1,6 +1,9 @@
 const format = new Intl.NumberFormat('ja-JP', { maximumFractionDigits: 3 }).format;
 const number = (name, label, min = 0, step = 'any', value) => ({ name, label, type: 'number', min, step, value });
 const time = (name, label) => ({ name, label, type: 'time' });
+const select = (name, label, choices) => ({ name, label, choices });
+const watts = [200, 300, 500, 600, 700, 800, 900, 1000, 1200, 1500]
+  .map(value => [String(value), value + 'W']);
 const clockMinutes = (value) => {
   const [hours, minutes] = value.split(':').map(Number);
   return hours * 60 + minutes;
@@ -104,14 +107,58 @@ export const dailyTools = [
     },
   },
   {
-    id: 'allowance', name: 'おこづかい、あといくら？', category: 'お金・仕事',
-    description: '持っているお金から、買うものの値段を引いて、残りを確認。',
-    keywords: 'お小遣い 予算 残高 足りる たりる いくら おつり',
-    fields: [number('budget', '持っているお金（円）', 0, 1), number('cost', '買いたいものの合計（円）', 0, 1)],
-    calculate({ budget, cost }) {
-      if (!Number.isSafeInteger(budget) || !Number.isSafeInteger(cost)) return '持っているお金と、買いたいものの合計を入力してください。';
-      const balance = budget - cost;
-      return balance >= 0 ? `残りは ${format(balance)}円です。` : `あと ${format(-balance)}円あれば買えます。`;
+    id: 'microwave-time', name: '電子レンジの時間換算', category: '料理',
+    description: 'パッケージと家のレンジでワット数が違うときに、温め時間の目安を計算。',
+    keywords: 'レンジ れんじ ワット W 温め 加熱 冷凍 弁当',
+    fields: [
+      { ...select('from', 'パッケージの出力', watts), value: '500' },
+      { ...select('to', '使うレンジの出力', watts), value: '600' },
+      { ...number('minutes', '表示時間（分）', 0, 1, 0), max: 120 },
+      { ...number('seconds', '表示時間（秒）', 0, 1, 0), max: 59 },
+    ],
+    calculate({ from, to, minutes, seconds }) {
+      if (minutes === undefined || seconds === undefined) return '分は0〜120、秒は0〜59の整数で入力してください。';
+      const elapsed = minutes * 60 + seconds;
+      if (elapsed <= 0) return 'パッケージの温め時間を入力してください。';
+      const converted = Math.round(elapsed * Number(from) / Number(to));
+      const time = converted === 0 ? '1秒未満' : `${Math.floor(converted / 60)}分${converted % 60}秒`;
+      return `${to}Wで 約${time}（秒単位で四捨五入）\n食品の状態や機種で変わるため、パッケージやレンジの指示を優先してください。`;
+    },
+  },
+  {
+    id: 'hourly-pay', name: '時給から給料の目安', category: 'お金・仕事',
+    description: '毎回の時給と実働が同じ場合に、控除前の基本給を見積もります。',
+    keywords: '時給 バイト パート 給料 給与 シフト 実働 手取り前',
+    fields: [
+      { ...number('rate', '時給（円）', 1, 1), max: 100_000 },
+      { ...number('hours', '1回の実働・休憩を除く（時間）', 0, 1, 0), max: 24 },
+      { ...number('minutes', '実働の端数（分）', 0, 1, 0), max: 59 },
+      { ...number('shifts', '勤務回数', 1, 1, 1), max: 366 },
+    ],
+    calculate({ rate, hours, minutes, shifts }) {
+      if (hours === undefined || minutes === undefined) return '実働の時間は0〜24、分は0〜59の整数で入力してください。';
+      const perShift = hours * 60 + minutes;
+      if (!rate || !shifts || !perShift) return '時給・実働時間・勤務回数を入力してください。';
+      if (perShift > 1440) return '1回の実働は24時間以内で入力してください。';
+      const total = perShift * shifts;
+      return `控除前の基本給 約${format(Math.round(rate * total / 60))}円（1円単位で四捨五入）\n実働合計 ${duration(total)}\n残業・深夜の割増や交通費は含めていません。`;
+    },
+  },
+  {
+    id: 'fuel-cost', name: 'ガソリン代の目安', category: 'お出かけ',
+    description: '走る距離と車の燃費から、ドライブや通勤の燃料代を見積もります。',
+    keywords: 'ドライブ 燃料 ガソリン 軽油 燃費 車 交通費 km リットル',
+    fields: [
+      number('distance', '走る距離の合計（km・往復なら往復分）'),
+      number('efficiency', '車の燃費（km/L）', 0.001),
+      number('price', '燃料1Lの価格（円）', 0.01),
+    ],
+    calculate({ distance, efficiency, price }) {
+      if (distance === undefined || !efficiency || price === undefined) return '距離・燃費・1Lあたりの価格を入力してください。';
+      const liters = distance / efficiency;
+      const cost = liters * price;
+      if (!Number.isFinite(cost)) return '計算範囲を超えています。';
+      return `燃料代 約${format(Math.round(cost))}円（1円単位で四捨五入）\n使う燃料 約${format(liters)}L`;
     },
   },
 ];

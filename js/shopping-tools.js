@@ -17,7 +17,7 @@ export const shoppingTools = [
       let nextId = 1;
       const hint = document.createElement('p');
       hint.className = 'field-wide form-hint';
-      hint.textContent = '価格の条件はそろえてください（例：すべて税込）。';
+      hint.textContent = '価格の条件をそろえ（例：すべて税込）、複数個入りは合計の内容量を入力してください。';
       const list = document.createElement('div');
       list.className = 'field-wide product-list';
       const add = document.createElement('button');
@@ -109,6 +109,26 @@ export const shoppingTools = [
       return difference > 0
         ? `${format(rate * 100)}%引き（${format(rate * 10)}割引）\n${format(difference)}円安くなります。`
         : `${format(rate * 100)}%値上がり\n${format(-difference)}円高くなります。`;
+    },
+  },
+  {
+    id: 'sales-tax', name: '税込・税抜はいくら？', category: '買い物',
+    description: '税抜表示での支払額や、税込表示から税抜の目安を確認。',
+    keywords: '消費税 税込み 税抜き ぜいこみ 8% 10% 本体価格 会計',
+    fields: [
+      { ...input('amount', '表示価格（円）', 0), step: 1, max: 1_000_000_000 },
+      { name: 'direction', label: '表示価格は？', choices: [['before', '税抜'], ['after', '税込']] },
+      { name: 'rate', label: '税率', choices: [['10', '10%'], ['8', '8%']] },
+    ],
+    calculate({ amount, direction, rate }) {
+      if (amount === undefined) return '表示価格を0〜10億円の整数で入力してください。';
+      const percent = Number(rate);
+      if (direction === 'after') {
+        const before = Math.round(amount * 100 / (100 + percent));
+        return `税抜の目安 約${format(before)}円\n消費税相当額 約${format(amount - before)}円\n税込価格からの逆算は1円単位で四捨五入しています。`;
+      }
+      const tax = Math.floor(amount * percent / 100);
+      return `税込の目安 ${format(amount + tax)}円\n消費税 ${format(tax)}円\n税額の1円未満は切り捨て。お店の端数処理で変わる場合があります。`;
     },
   },
 ];
